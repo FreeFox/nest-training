@@ -24,9 +24,11 @@ export class ProfilesService {
 
     findOne(id: string) {
         const profile = this.profiles.find(profile => profile.id === id);
+
         if (!profile) {
-            throw new NotFoundException('Profile not found');
+            throw new NotFoundException(`Profile ${id} not found`);
         }
+
         return profile;
     }
 
@@ -42,26 +44,27 @@ export class ProfilesService {
     update(id: string, updateProfileDto: UpdateProfileDto) {
         const profileIndex = this.profiles.findIndex(profile => profile.id == id);
 
-        if (profileIndex !== -1) {
-            // parse string id to uuid
-            this.profiles[profileIndex] = {
-                id: this.profiles[profileIndex].id,
-                ...updateProfileDto
-            };
-            return this.profiles[profileIndex];
+        if (profileIndex === -1) {
+            throw new NotFoundException(`Profile ${id} not found`);
         }
 
-        throw new NotFoundException('Profile not found');
+        // parse string id to uuid
+        this.profiles[profileIndex] = {
+            id: this.profiles[profileIndex].id,
+            ...updateProfileDto
+        };
+
+        return this.profiles[profileIndex];
     }
 
     remove(id: string) {
         const profileIndex = this.profiles.findIndex(profile => profile.id == id);
         
-        if (profileIndex !== -1) {
-            this.profiles.splice(profileIndex, 1);
-            return true;
+        if (profileIndex === -1) {
+            throw new NotFoundException(`Profile ${id} not found`);
         }
 
-        throw new NotFoundException('Profile not found');
+        this.profiles.splice(profileIndex, 1);
+        return true;
     }
 }
