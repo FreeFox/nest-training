@@ -16,7 +16,7 @@ export class ProfilesController {
 
     // GET /profiles/:id
     @Get(':id')
-    findOne(@Param('id', ParseUUIDPipe) id: string) {
+    findOne(@Param('id', ParseUUIDPipe) id: UUID) {
         return this.profilesService.findOne(id);
     }
 
@@ -26,7 +26,7 @@ export class ProfilesController {
     }
 
     @Put(':id')
-    update(@Param('id', ParseUUIDPipe) id: string, @Body() updateProfileDto: UpdateProfileDto) {
+    update(@Param('id', ParseUUIDPipe) id: UUID, @Body() updateProfileDto: UpdateProfileDto) {
         const updatedProfile = this.profilesService.update(id, updateProfileDto);
 
         return updatedProfile;
@@ -34,7 +34,7 @@ export class ProfilesController {
 
     @Delete(':id')
     @HttpCode(HttpStatus.NO_CONTENT)
-    remove(@Param('id', ParseUUIDPipe) id: string) {
+    remove(@Param('id', ParseUUIDPipe) id: UUID) {
         const isDeleted = this.profilesService.remove(id);
         
         return {"deleted": isDeleted};
