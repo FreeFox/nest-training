@@ -11,7 +11,7 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 export class ProfilesService {
     constructor(private prisma: PrismaService) {}
 
-    async profile(
+    async findOne(
         profileWhereUniqueInput: Prisma.ProfileWhereUniqueInput,
     ): Promise<Profile | null> {
         return this.prisma.profile.findUnique({
@@ -19,7 +19,7 @@ export class ProfilesService {
         });
     }
 
-    async profilesAll(params: {
+    async findAll(params: {
         skip?: number;
         take?: number;
         cursor?: Prisma.ProfileWhereUniqueInput;
@@ -37,6 +37,15 @@ export class ProfilesService {
         });
     }
 
+    async create(data: CreateProfileDto): Promise<Profile> {
+        return this.prisma.profile.create({
+            data: {
+                ...data,
+                id: randomUUID()
+            }
+        });
+    }
+
     private profiles = [
         {
             id: randomUUID(),
@@ -49,29 +58,6 @@ export class ProfilesService {
             description: 'Jane Doe Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
         }
     ];
-
-    findAll() {
-        return this.profiles;
-    }
-
-    findOne(id: string) {
-        const profile = this.profiles.find(profile => profile.id === id);
-
-        if (!profile) {
-            throw new NotFoundException(`Profile ${id} not found`);
-        }
-
-        return profile;
-    }
-
-    create(createProfileDto: CreateProfileDto) {
-        const newProfile = {
-            id: randomUUID(),
-            ...createProfileDto
-        };
-        this.profiles.push(newProfile);
-        return newProfile;
-    }
 
     update(id: string, updateProfileDto: UpdateProfileDto) {
         const profileIndex = this.profiles.findIndex(profile => profile.id == id);

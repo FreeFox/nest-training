@@ -14,13 +14,13 @@ export class ProfilesController {
     // GET /profiles
     @Get()
     async findAll() : Promise<ProfileModel[]> {
-        return this.profilesService.profilesAll({});
+        return this.profilesService.findAll({});
     }
 
     // GET /profiles/:id
     @Get(':id')
     findOne(@Param('id', ParseUUIDPipe) id: UUID): Promise<ProfileModel | null> {
-        return this.profilesService.profile({id});
+        return this.profilesService.findOne({id});
     }
 
     @Post()
