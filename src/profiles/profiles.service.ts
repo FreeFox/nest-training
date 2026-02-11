@@ -2,9 +2,41 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import type { CreateProfileDto } from './dto/create-profile.dto';
 import type { UpdateProfileDto } from './dto/update-profile.dto';
+import { PrismaService } from '../prisma.service';
+import { Profile } from 'src/generated/prisma/client';
+import { Prisma } from 'src/generated/prisma/client';
+import { HttpException, HttpStatus } from '@nestjs/common';
 
 @Injectable()
 export class ProfilesService {
+    constructor(private prisma: PrismaService) {}
+
+    async profile(
+        profileWhereUniqueInput: Prisma.ProfileWhereUniqueInput,
+    ): Promise<Profile | null> {
+        return this.prisma.profile.findUnique({
+            where: profileWhereUniqueInput,
+        });
+    }
+
+    async profilesAll(params: {
+        skip?: number;
+        take?: number;
+        cursor?: Prisma.ProfileWhereUniqueInput;
+        where?: Prisma.ProfileWhereInput;
+        orderBy?: Prisma.ProfileOrderByWithRelationInput;
+    }): Promise<Profile[]> {
+        const { skip, take, cursor, where, orderBy } = params;
+
+        return this.prisma.profile.findMany({
+            skip,
+            take,
+            cursor,
+            where,
+            orderBy,
+        });
+    }
+
     private profiles = [
         {
             id: randomUUID(),
