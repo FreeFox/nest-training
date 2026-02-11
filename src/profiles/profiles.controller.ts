@@ -1,10 +1,12 @@
-import { Controller, Get, Query, Param, Post, Body, Put, Delete, HttpCode, HttpStatus, ParseUUIDPipe } from '@nestjs/common';
+import { Controller, Get, Query, Param, Post, Body, Put, Delete, HttpCode, HttpStatus, ParseUUIDPipe, UseGuards } from '@nestjs/common';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ProfilesService } from './profiles.service';
+import { ProfilesGuard } from './profiles.guard';
 import type { UUID } from 'crypto';
 
 @Controller('profiles')
+@UseGuards(ProfilesGuard)
 export class ProfilesController {
     constructor(private readonly profilesService: ProfilesService) {}
 
