@@ -19,8 +19,8 @@ export class ProfilesController {
 
     // GET /profiles/:id
     @Get(':id')
-    findOne(@Param('id', ParseUUIDPipe) id: UUID) {
-        return this.profilesService.findOne(id);
+    findOne(@Param('id', ParseUUIDPipe) id: UUID): Promise<ProfileModel | null> {
+        return this.profilesService.profile({id});
     }
 
     @Post()
