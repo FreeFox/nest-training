@@ -46,6 +46,17 @@ export class ProfilesService {
         });
     }
 
+    async update(id, data: UpdateProfileDto): Promise<Profile> {
+        return this.prisma.profile.update({
+            data: {
+                ...data
+            },
+            where: {
+                id
+            }
+        });
+    }
+
     private profiles = [
         {
             id: randomUUID(),
@@ -58,22 +69,6 @@ export class ProfilesService {
             description: 'Jane Doe Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
         }
     ];
-
-    update(id: string, updateProfileDto: UpdateProfileDto) {
-        const profileIndex = this.profiles.findIndex(profile => profile.id == id);
-
-        if (profileIndex === -1) {
-            throw new NotFoundException(`Profile ${id} not found`);
-        }
-
-        // parse string id to uuid
-        this.profiles[profileIndex] = {
-            id: this.profiles[profileIndex].id,
-            ...updateProfileDto
-        };
-
-        return this.profiles[profileIndex];
-    }
 
     remove(id: string) {
         const profileIndex = this.profiles.findIndex(profile => profile.id == id);
