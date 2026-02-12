@@ -14,9 +14,15 @@ export class ProfilesService {
     async findOne(
         profileWhereUniqueInput: Prisma.ProfileWhereUniqueInput,
     ): Promise<Profile | null> {
-        return this.prisma.profile.findUnique({
+        const profile = await this.prisma.profile.findUnique({
             where: profileWhereUniqueInput,
         });
+
+        if (!profile) {
+            throw new NotFoundException(`Profile with id ${profileWhereUniqueInput.id} not found`);
+        }
+
+        return profile;
     }
 
     async findAll(params: {
@@ -38,46 +44,51 @@ export class ProfilesService {
     }
 
     async create(data: CreateProfileDto): Promise<Profile> {
-        return this.prisma.profile.create({
-            data: {
-                ...data,
-                id: randomUUID()
-            }
-        });
-    }
-
-    async update(id, data: UpdateProfileDto): Promise<Profile> {
-        return this.prisma.profile.update({
-            data: {
-                ...data
-            },
-            where: {
-                id
-            }
-        });
-    }
-
-    private profiles = [
-        {
-            id: randomUUID(),
-            name: 'John Doe',
-            description: 'John Doe Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
-        },
-        {
-            id: randomUUID(),
-            name: 'Jane Doe',
-            description: 'Jane Doe Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+        try {
+            return await this.prisma.profile.create({
+                data: {
+                    ...data,
+                    id: randomUUID()
+                }
+            });
+        } catch (error) {
+            throw new HttpException('Failed to create profile', HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    ];
-
-    remove(id: string) {
-        const profileIndex = this.profiles.findIndex(profile => profile.id == id);
-        
-        if (profileIndex === -1) {
-            throw new NotFoundException(`Profile ${id} not found`);
-        }
-
-        this.profiles.splice(profileIndex, 1);
-        return true;
     }
+
+    async update(id: string, data: UpdateProfileDto): Promise<Profile> {
+        try {
+            return await this.prisma.profile.update({
+                data: {
+                    ...data
+                },
+                where: {
+                    id
+                }
+            });
+        } catch (error) {
+            if (error.code === 'P2025') {
+                throw new NotFoundException(`Profile with id ${id} not found`);
+            }
+
+            throw error;
+        }
+    }
+
+    async remove(id: string): Promise<Profile> {
+        try {
+            return await this.prisma.profile.delete({
+                where: {
+                    id
+                }
+            });
+        } catch (error) {
+            if (error.code === 'P2025') {
+                throw new NotFoundException(`Profile with id ${id} not found`);
+            }
+
+            throw error;
+        }
+    }
+
 }
