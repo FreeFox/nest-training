@@ -34,7 +34,7 @@ export class ProfilesService {
     }): Promise<Profile[]> {
         const { skip, take, cursor, where, orderBy } = params;
 
-        return this.prisma.profile.findMany({
+        return await this.prisma.profile.findMany({
             skip,
             take,
             cursor,
